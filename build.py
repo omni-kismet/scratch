@@ -47,15 +47,19 @@ def git_checkout_and_build(args):
 
     return repo
 
+import os
+import shutil
+
 def commit_built_artifacts(args, source_repo):
     try:
         print(f"Cloning {args.commit_repo}...")
         commit_repo = Repo.clone_from(args.commit_repo, "commit_repo", env={'GIT_SSH_COMMAND': 'ssh -o StrictHostKeyChecking=no'})
 
-        print("Adding built artifacts (jar and xml files)...")
-        for root, _, files in os.walk("source_repo"):
+        print("Adding built artifacts (jar files)...")
+        artifacts_dir = os.path.join("source_repo", "build", "distributions")
+        for root, _, files in os.walk(artifacts_dir):
             for file in files:
-                if file.endswith('.jar') or file.endswith('.xml'):
+                if file.endswith('.jar'):
                     source_path = os.path.join(root, file)
                     target_path = os.path.join("commit_repo", file)
                     os.replace(source_path, target_path)
